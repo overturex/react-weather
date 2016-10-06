@@ -19,7 +19,7 @@ var WeatherForm = React.createClass({
             <form className="form-horizontal" onSubmit={this.addWeather}>
                 <div className="form-group">
                     <div className="col-sm-10">
-                        <input className="form-control" onChange={this.onChange} value={this.state.city} placeholder="city name"/>
+                        <input className="form-control" onChange={this.onChange} value={this.state.city} placeholder="add by city name"/>
                     </div>
                     <div className="col-sm-2">
                         <button type="submit" className="btn btn-default">search</button>

@@ -8,9 +8,9 @@ gulp.task('browserify', function(){
         .transform(babelify, {'presets': ['es2015', 'react']})
         .bundle()
         .pipe(source('bundle.js'))
-        .pipe(gulp.dest('build/js'));
+        .pipe(gulp.dest('../build/js'));
 });
 
 gulp.task('watch', function(){
-    gulp.watch('./app/components/**/*.js', ['browserify']);
+    gulp.watch('./app/**/*.js', ['browserify']);
 });

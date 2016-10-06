@@ -87,19 +87,47 @@ var WeatherApp = _react2.default.createClass({
     displayName: 'WeatherApp',
 
     getInitialState: function getInitialState() {
+
         return {
             items: []
         };
+    },
+    componentDidMount: function componentDidMount() {
+        var cityList = _WeatherService2.default.getCityList();
+        var items = [];
+        var length = cityList ? cityList.length : 0;
+        var self = this;
+
+        if (length > 0) {
+
+            cityList.forEach(function (city) {
+                _WeatherService2.default.getWeatherByCity(city).then(function (weather) {
+                    items.push(weather);
+                    self.setState({ items: items });
+                });
+            });
+        }
     },
     addWeatherByCity: function addWeatherByCity(city) {
 
         var self = this;
 
-        _WeatherService2.default.getWeatherByCity(city).then(function (weather) {
-            var items = self.state.items;
-            items.push(weather);
-            self.setState({ items: items });
+        var items = self.state.items;
+        var isExist = items.find(function (item) {
+            return item.name.toUpperCase() == city.toUpperCase();
         });
+
+        if (!isExist) {
+
+            _WeatherService2.default.getWeatherByCity(city).then(function (weather) {
+
+                items.push(weather);
+                self.setState({ items: items });
+                _WeatherService2.default.saveWeatherList(items);
+            });
+        } else {
+            alert('city already exist!');
+        }
     },
     render: function render() {
         return _react2.default.createElement(
@@ -110,7 +138,7 @@ var WeatherApp = _react2.default.createClass({
         );
     }
 });
-//import $ from 'jquery';
+
 exports.default = WeatherApp;
 
 },{"../lib/WeatherService":6,"./WeatherForm":4,"./WeatherList":5,"react":178}],4:[function(require,module,exports){
@@ -152,7 +180,7 @@ var WeatherForm = _react2.default.createClass({
                 _react2.default.createElement(
                     'div',
                     { className: 'col-sm-10' },
-                    _react2.default.createElement('input', { className: 'form-control', onChange: this.onChange, value: this.state.city, placeholder: 'city name' })
+                    _react2.default.createElement('input', { className: 'form-control', onChange: this.onChange, value: this.state.city, placeholder: 'add by city name' })
                 ),
                 _react2.default.createElement(
                     'div',
@@ -245,6 +273,33 @@ WeatherService.getWeatherByCity = function (city) {
     });
 
     return deferred.promise();
+};
+
+WeatherService.saveWeatherList = function (items) {
+
+    var cityList = [];
+    items.forEach(function (item) {
+        cityList.push(item.name);
+    });
+
+    if (typeof Storage !== 'undefined') {
+        localStorage.setItem("ReactWeather.CityList", JSON.stringify(cityList));
+    } else {
+        console.log('Sorry! No Web Storage support..');
+    }
+};
+
+WeatherService.getCityList = function () {
+
+    var cityList = [];
+
+    if (typeof Storage !== 'undefined') {
+        cityList = JSON.parse(localStorage.getItem("ReactWeather.CityList"));
+    } else {
+        console.log('Sorry! No Web Storage support..');
+    }
+
+    return cityList;
 };
 
 exports.default = WeatherService;
